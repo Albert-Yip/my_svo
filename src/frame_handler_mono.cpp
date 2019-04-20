@@ -184,6 +184,8 @@ FrameHandlerBase::UpdateResult FrameHandlerMono::processFrame()
   optimizeStructure(new_frame_, Config::structureOptimMaxPts(), Config::structureOptimNumIter());
   SVO_STOP_TIMER("point_optimizer");
 
+  //在此之后，new_frame_的feature的空间点new_frame_->fts_ （list）、以及位姿new_frame_->T_f_w_都经过优化
+
   // select keyframe
   core_kfs_.insert(new_frame_);
   setTrackingQuality(sfba_n_edges_final);
@@ -193,7 +195,7 @@ FrameHandlerBase::UpdateResult FrameHandlerMono::processFrame()
     return RESULT_FAILURE;
   }
   double depth_mean, depth_min;
-  frame_utils::getSceneDepth(*new_frame_, depth_mean, depth_min);
+  frame_utils::getSceneDepth(*new_frame_, depth_mean, depth_min);//遍历features，求已有三维坐标的深度d求最小值和中位数
   if(!needNewKf(depth_mean) || tracking_quality_ == TRACKING_BAD)//NOTE:判断是否需要新的关键帧
   {
     depth_filter_->addFrame(new_frame_);//NOTE:不是关键帧，更新深度滤波器
@@ -227,7 +229,8 @@ FrameHandlerBase::UpdateResult FrameHandlerMono::processFrame()
 #endif
 
   // init new depth-filters
-  depth_filter_->addKeyframe(new_frame_, depth_mean, 0.5*depth_min);//NOT:这里是深度滤波器插入关键帧的主要操作
+  depth_filter_->addKeyframe(new_frame_, depth_mean, 0.5*depth_min);//NOT:这里是深度滤波器插入关键帧的主要操作，init Seeds，把当前帧监测到的特征点用来初始化种子，已有feature直接占据像素网格，新feature做seeds_.push_back，均值为1.0/depth_mean，标准差为1.0/（6*depth_min）。
+  //注意只在插入新的关键帧时会做feature detect，普通帧靠 光流跟踪（pose） 和 极线搜索(Depth Filter)
 
   // if limited number of keyframes, remove the one furthest apart
   if(Config::maxNKfs() > 2 && map_.size() >= Config::maxNKfs())

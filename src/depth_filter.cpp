@@ -114,16 +114,16 @@ void DepthFilter::addKeyframe(FramePtr frame, double depth_mean, double depth_mi
 void DepthFilter::initializeSeeds(FramePtr frame)
 {
   Features new_features;
-  feature_detector_->setExistingFeatures(frame->fts_);
+  feature_detector_->setExistingFeatures(frame->fts_);//把之前已检测到的features占据网格
   feature_detector_->detect(frame.get(), frame->img_pyr_,
-                            Config::triangMinCornerScore(), new_features);
+                            Config::triangMinCornerScore(), new_features);//检测新的features存入new_features
 
   // initialize a seed for every new feature
   seeds_updating_halt_ = true;
   lock_t lock(seeds_mut_); // by locking the updateSeeds function stops
   ++Seed::batch_counter;
   std::for_each(new_features.begin(), new_features.end(), [&](Feature* ftr){
-    seeds_.push_back(Seed(ftr, new_keyframe_mean_depth_, new_keyframe_min_depth_));
+    seeds_.push_back(Seed(ftr, new_keyframe_mean_depth_, new_keyframe_min_depth_));//把new_features放入Seed
   });
 
   if(options_.verbose)
@@ -196,6 +196,8 @@ void DepthFilter::updateSeedsLoop()
 
 void DepthFilter::updateSeeds(FramePtr frame)
 {
+  //此时在参考帧（关键帧）的所有features都会在depthFilter的list<Seed>上有seed对应，存储其深度均值和方差
+
   // update only a limited number of seeds, because we don't have time to do it
   // for all the seeds in every frame!
   size_t n_updates=0, n_failed_matches=0, n_seeds = seeds_.size();
@@ -235,7 +237,7 @@ void DepthFilter::updateSeeds(FramePtr frame)
     float z_inv_max = max(it->mu - sqrt(it->sigma2), 0.00000001f);
     double z;
     if(!matcher_.findEpipolarMatchDirect(
-        *it->ftr->frame, *frame, *it->ftr, 1.0/it->mu, 1.0/z_inv_min, 1.0/z_inv_max, z))//NOTE:极线搜索+三角化深度估计
+        *it->ftr->frame, *frame, *it->ftr, 1.0/it->mu, 1.0/z_inv_min, 1.0/z_inv_max, z))//NOTE:极线搜索+三角化深度估计，对象是当前帧和参考关键帧
     {
       it->b++; // increase outlier probability when no match was found
       ++it;

@@ -70,6 +70,7 @@ public:
 /// Map object which saves all keyframes which are in a map.
 class Map : boost::noncopyable
 {
+//Map保存的是Key Frame 以及还未插入地图的KF中的已经收敛的3d点坐标
 public:
   list< FramePtr > keyframes_;          //!< List of keyframes in the map.
   list< Point* > trash_points_;         //!< A deleted point is moved to the trash bin. Now and then this is cleaned. One reason is that the visualizer must remove the points also.

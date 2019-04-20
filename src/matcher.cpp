@@ -192,7 +192,7 @@ bool Matcher::findEpipolarMatchDirect(
   // Compute start and end of epipolar line in old_kf for match search, on unit plane!
   Vector2d A = vk::project2d(T_cur_ref * (ref_ftr.f*d_min));
   Vector2d B = vk::project2d(T_cur_ref * (ref_ftr.f*d_max));
-  epi_dir_ = A - B;
+  epi_dir_ = A - B;//NOTE：确定确定逆深度的搜索范围
 
   // Compute affine warp matrix
   warp::getWarpMatrixAffine(
@@ -223,7 +223,7 @@ bool Matcher::findEpipolarMatchDirect(
                    ref_ftr.level, search_level_, halfpatch_size_+1, patch_with_border_);
   createPatchFromPatchWithBorder();
 
-  if(epi_length_ < 2.0)
+  if(epi_length_ < 2.0)//如果两个端点间的像素距离小于2个像素，就直接进行优化位置
   {
     px_cur_ = (px_A+px_B)/2.0;
     Vector2d px_scaled(px_cur_/(1<<search_level_));
@@ -239,12 +239,13 @@ bool Matcher::findEpipolarMatchDirect(
     if(res)
     {
       px_cur_ = px_scaled*(1<<search_level_);
-      if(depthFromTriangulation(T_cur_ref, ref_ftr.f, cur_frame.cam_->cam2world(px_cur_), depth))
+      if(depthFromTriangulation(T_cur_ref, ref_ftr.f, cur_frame.cam_->cam2world(px_cur_), depth))//三角定位求得深度估计值
         return true;
     }
     return false;
   }
 
+  //如果两个端点间像素距离大于2个像素，就在极线上进行搜索
   size_t n_steps = epi_length_/0.7; // one step per pixel
   Vector2d step = epi_dir_/n_steps;
 

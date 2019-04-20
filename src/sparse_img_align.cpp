@@ -65,7 +65,7 @@ size_t SparseImgAlign::run(FramePtr ref_frame, FramePtr cur_frame)
     have_ref_patch_cache_ = false;
     if(verbose_)
       printf("\nPYRAMID LEVEL %i\n---------------\n", level_);
-    optimize(T_cur_from_ref);//NOTE: QS,where is the optimize(SE3)?)
+    optimize(T_cur_from_ref);
   }
   cur_frame_->T_f_w_ = T_cur_from_ref * ref_frame_->T_f_w_;
 
