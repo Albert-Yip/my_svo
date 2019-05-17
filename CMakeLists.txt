@@ -42,6 +42,23 @@ ELSE()
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 ENDIF()
 SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -fsee -fomit-frame-pointer -fno-signed-zeros -fno-math-errno -funroll-loops")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g") 
+
+# Set build flags, set ARM_ARCHITECTURE environment variable on Odroid
+# SET(CMAKE_CXX_FLAGS "-Wall -D_LINUX -D_REENTRANT -march=native -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unknown-pragmas")
+# IF(DEFINED ENV{ARM_ARCHITECTURE})
+#   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=neon -march=armv7-a")
+# ELSE()
+#   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmmx -msse -msse -msse2 -msse3 -mssse3")
+# ENDIF()
+# IF(CMAKE_COMPILER_IS_GNUCC)
+#   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+# ELSE()
+#   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+# ENDIF()
+# SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O0 -fsee -fomit-frame-pointer -fno-signed-zeros -fno-math-errno -funroll-loops")
+
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g") 
 
 # Add plain cmake packages 
 FIND_PACKAGE(OpenCV REQUIRED)
@@ -128,26 +145,26 @@ TARGET_LINK_LIBRARIES(svo ${LINK_LIBS})
 ################################################################################
 # TESTS
 
-ADD_EXECUTABLE(test_feature_align test/test_feature_alignment.cpp)
-TARGET_LINK_LIBRARIES(test_feature_align svo)
+# ADD_EXECUTABLE(test_feature_align test/test_feature_alignment.cpp)
+# TARGET_LINK_LIBRARIES(test_feature_align svo)
 
 ADD_EXECUTABLE(test_pipeline test/test_pipeline.cpp)
 TARGET_LINK_LIBRARIES(test_pipeline svo)
 
-ADD_EXECUTABLE(test_matcher test/test_matcher.cpp)
-TARGET_LINK_LIBRARIES(test_matcher svo)
+# ADD_EXECUTABLE(test_matcher test/test_matcher.cpp)
+# TARGET_LINK_LIBRARIES(test_matcher svo)
 
-ADD_EXECUTABLE(test_feature_detection test/test_feature_detection.cpp)
-TARGET_LINK_LIBRARIES(test_feature_detection svo)
+# ADD_EXECUTABLE(test_feature_detection test/test_feature_detection.cpp)
+# TARGET_LINK_LIBRARIES(test_feature_detection svo)
 
-ADD_EXECUTABLE(test_depth_filter test/test_depth_filter.cpp)
-TARGET_LINK_LIBRARIES(test_depth_filter svo)
+# ADD_EXECUTABLE(test_depth_filter test/test_depth_filter.cpp)
+# TARGET_LINK_LIBRARIES(test_depth_filter svo)
 
-ADD_EXECUTABLE(test_sparse_img_align test/test_sparse_img_align.cpp)
-TARGET_LINK_LIBRARIES(test_sparse_img_align svo)
+# ADD_EXECUTABLE(test_sparse_img_align test/test_sparse_img_align.cpp)
+# TARGET_LINK_LIBRARIES(test_sparse_img_align svo)
 
-ADD_EXECUTABLE(test_pose_optimizer test/test_pose_optimizer.cpp)
-TARGET_LINK_LIBRARIES(test_pose_optimizer svo) 
+# ADD_EXECUTABLE(test_pose_optimizer test/test_pose_optimizer.cpp)
+# TARGET_LINK_LIBRARIES(test_pose_optimizer svo) 
 
 # install(DIRECTORY include/svo DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 # install(
