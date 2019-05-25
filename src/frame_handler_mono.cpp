@@ -87,6 +87,7 @@ void FrameHandlerMono::addImage(const cv::Mat& img, const double timestamp)
 
   // finish processing
   finishFrameProcessingCommon(last_frame_->id_, res, last_frame_->nObs());
+  std::cout<<"frame_pointer = "<<last_frame_.get()<<std::endl;
 }
 
 FramePtr FrameHandlerMono::lastFrame() { return last_frame_; }

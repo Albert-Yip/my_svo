@@ -207,6 +207,7 @@ void DepthFilter::updateSeeds(FramePtr frame)
   const double focal_length = frame->cam_->errorMultiplier2();
   double px_noise = 1.0;
   double px_error_angle = atan(px_noise/(2.0*focal_length))*2.0; // law of chord (sehnensatz)
+  int converged_counter = 0;
 
   while( it!=seeds_.end())
   {
@@ -260,7 +261,7 @@ void DepthFilter::updateSeeds(FramePtr frame)
     }
 
     // if the seed has converged, we initialize a new candidate point and remove the seed
-    if(sqrt(it->sigma2) < it->z_range/options_.seed_convergence_sigma2_thresh)
+    if(sqrt(it->sigma2) < it->z_range/options_.seed_convergence_sigma2_thresh)//seed_convergence_sigma2_thresh = 200
     {
       assert(it->ftr->point == NULL); // TODO this should not happen anymore
       Vector3d xyz_world(it->ftr->frame->T_f_w_.inverse() * (it->ftr->f * (1.0/it->mu)));
@@ -279,6 +280,7 @@ void DepthFilter::updateSeeds(FramePtr frame)
       */
       {
         seed_converged_cb_(point, it->sigma2); // put in candidate list
+        converged_counter++;
       }
       it = seeds_.erase(it);
     }
@@ -290,6 +292,8 @@ void DepthFilter::updateSeeds(FramePtr frame)
     else
       ++it;
   }
+  if(options_.verbose && converged_counter!=0)
+    SVO_INFO_STREAM("NOTE: "<<converged_counter << " seeds have converged and been put into candidate list");
 }
 
 void DepthFilter::clearFrameQueue()
@@ -308,7 +312,7 @@ void DepthFilter::getSeedsCopy(const FramePtr& frame, std::list<Seed>& seeds)
   }
 }
 
-void DepthFilter::updateSeed(const float x, const float tau2, Seed* seed)
+void DepthFilter::updateSeed(const float x, const float tau2, Seed* seed)//NOTE:传入参数分别为均值、方差、和seed的指针
 {
   float norm_scale = sqrt(seed->sigma2 + tau2);
   if(std::isnan(norm_scale))

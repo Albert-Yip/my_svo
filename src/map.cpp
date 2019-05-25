@@ -223,6 +223,7 @@ void MapPointCandidates::addCandidatePointToFrame(FramePtr frame)
   PointCandidateList::iterator it=candidates_.begin();
   while(it != candidates_.end())
   {
+    std::cout<<"candidate frame pointer = "<<it->first->obs_.front()->frame<<std::endl;
     if(it->first->obs_.front()->frame == frame.get())
     {
       // insert feature in the frame
